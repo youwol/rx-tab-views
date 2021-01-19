@@ -1,0 +1,102 @@
+<html>
+    <head>
+        <script src="https://unpkg.com/rxjs@6/bundles/rxjs.umd.min.js"></script>
+
+        <script src="https://unpkg.com/@youwol/flux-view@0.0.4/dist/@youwol/flux-view.js"></script>
+        
+        <script src="https://unpkg.com/@youwol/fv-tabs@0.0.0/dist/@youwol/fv-group"  ></script>
+        <!--
+            <script src="../../../dist/@youwol/fv-tabs.js"  ></script>
+            <script src="https://unpkg.com/@youwol/fv-tabs@0.0.0/dist/@youwol/fv-group"  ></script>
+        -->
+        
+
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
+        crossorigin="anonymous">
+        
+
+    </head>
+
+    <body class="hv-100 wv-100 fv-bg-background p-5 ">
+        <div id="header" class="my-5">
+        </div>
+        <div id="container" class="p-3 m-2 d-flex flex-column align-items-center fv-bg-background-alt h-50">
+        </div>
+
+        <script>
+            let fv = window["@youwol/flux-view"]
+            let { Tabs }= window["@youwol/fv-tabs"]
+            let rxjs = window["rxjs"]
+
+            //------------------------
+            // Simple tabs example
+            //------------------------
+
+            let tabsData = [
+                new Tabs.TabData("general", "General"),
+                new Tabs.TabData("details", "Details"),
+            ]
+            let state = new Tabs.State(tabsData)
+            let vDOM = new Tabs.View({
+                class:'d-flex flex-column h-100',
+                state,
+                headerView: (state, tab) => ({innerText: tab.name, class:'px-2'}),
+                contentView: (state, tab) => ({innerText: `Hello ${tab.name}`, class:'fv-text-primary text-center'})
+            })
+
+            document.getElementById('container').appendChild(fv.render(vDOM))
+
+
+
+
+            //--------------------------------------------------
+            // Option to select the theme - unrelated to tabs
+            //--------------------------------------------------
+            let theme$ = new rxjs.BehaviorSubject('youwol')
+
+            let link$ = theme$.pipe(
+                rxjs.operators.map( (theme) => {
+                    console.log(`Fetch ${theme} theme`)
+                    let link = document.createElement('link')
+                    link.id='theme-css' 
+                    link.rel="stylesheet" 
+                    link.href=`https://unpkg.com/@youwol/fv-widgets@0.0.1/assets/styles/style.${theme}.css` 
+                    return link
+                })
+            )
+
+            vDom = {
+                class:'d-flex fv-text-focus justify-content-center',
+                children:[
+                    {   class:'px-2',
+                        innerText: 'Current theme'
+                    },
+                    {
+                        tag:'select',
+                        children:[
+                            {tag:'option', innerText:'youwol'},
+                            {tag:'option', innerText:'gg-default'},
+                            {tag:'option', innerText:'gg-dark'},
+                        ],
+                        onchange: (ev) => theme$.next( ev.target.value)
+                    }
+                ],
+                connectedCallback: (elem) => {
+                    
+                    elem.subscriptions.push(
+                        link$.subscribe( link => {
+
+                            if(document.getElementById("theme-css"))
+                                document.getElementById("theme-css").remove()
+                            document.head.appendChild(link)
+                        })
+                    )
+                }
+            }
+            document.getElementById('header').appendChild(fv.render(vDom))
+        </script>
+    </body>
+</html>
+
