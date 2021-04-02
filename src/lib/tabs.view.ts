@@ -35,11 +35,25 @@ export namespace Tabs {
         }
     }
 
-    export let defaultHeaderClass = 'd-flex fv-text-primary fv-bg-background fv-pointer'
-    export let defaultContainerClass = 'border flex-grow-1 w-100'
-    export let defaultSelectedHeaderClass = 'fv-bg-focus fv-text-on-focus'
+    type TOptions = {
+        headerClass?: string,
+        headerStyle?: {[key:string]: string},
+        selectedHeaderClass?: string,
+        selectedHeaderStyle?: {[key:string]: string},
+        containerClass?: string,
+        containerStyle?: {[key:string]: string},
+    }
 
     export class View implements VirtualDOM {
+
+        static defaultOptions : TOptions = {
+            headerClass: 'd-flex fv-text-primary fv-bg-background fv-pointer',
+            headerStyle: {},
+            selectedHeaderClass: 'fv-bg-focus fv-text-on-focus',
+            selectedHeaderStyle: {},
+            containerClass: 'border flex-grow-1 w-100',
+            containerStyle: {'min-height':'0px'}
+        }
 
         public readonly state: State
         public readonly children: Array<VirtualDOM>
@@ -47,15 +61,17 @@ export namespace Tabs {
             state,
             contentView,
             headerView,
+            options,
             ...rest
         }:
         {
             state: State,
             contentView: (state: State, tabDate: TabData) => VirtualDOM,
-            headerView: (state: State, tabDate: TabData) => VirtualDOM
+            headerView: (state: State, tabDate: TabData) => VirtualDOM,
+            options?: TOptions
         }) {
             Object.assign(this, rest)
-
+            let styling : TOptions = {...View.defaultOptions, ...(options ? options : {}) }
             this.state = state
             let selectedId$ = this.state.selectedId$.pipe(filter( id => id != undefined))
 
@@ -63,13 +79,20 @@ export namespace Tabs {
                 this.state.tabsData$, 
                 (tabs: Array<TabData>) => {
                     return {
-                        class: defaultHeaderClass,
+                        class: styling.headerClass,
+                        style: styling.headerStyle,
                         children: tabs.map( (tabData) => {
                             return {
                                 class: attr$( 
                                     selectedId$, 
                                     (id:string) => {
-                                        return id == tabData.id ? defaultSelectedHeaderClass : "tutu" 
+                                        return id == tabData.id ? styling.selectedHeaderClass : "" 
+                                    }
+                                ),
+                                style: attr$( 
+                                    selectedId$, 
+                                    (id:string) => {
+                                        return id == tabData.id ? styling.selectedHeaderStyle : {} 
                                     }
                                 ),
                                 children: [ headerView(state, tabData) ],
@@ -89,7 +112,8 @@ export namespace Tabs {
             this.children = [
                 headers$,
                 {
-                    class: defaultContainerClass,
+                    class: styling.containerClass,
+                    style: styling.containerStyle,
                     children: [ content$ ]
                 }
             ]
