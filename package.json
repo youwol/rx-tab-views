@@ -7,7 +7,7 @@
         "view",
         "tabs"
     ],
-    "version": "0.0.2",
+    "version": "0.0.3",
     "description": "Tabs widgets using flux-view",
     "author": "Guillaume Reinisch",
     "license": "MIT",
