@@ -334,6 +334,7 @@ export namespace DockableTabs {
             left: {
                 writingMode: 'vertical-rl',
                 textOrientation: 'mixed',
+                transform: 'rotate(180deg)',
             },
             right: {
                 writingMode: 'vertical-rl',
