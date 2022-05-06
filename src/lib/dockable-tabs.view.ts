@@ -5,7 +5,13 @@ import {
     Stream$,
     VirtualDOM,
 } from '@youwol/flux-view'
-import { BehaviorSubject, combineLatest, ReplaySubject, Subject } from 'rxjs'
+import {
+    BehaviorSubject,
+    combineLatest,
+    Observable,
+    ReplaySubject,
+    Subject,
+} from 'rxjs'
 
 export namespace DockableTabs {
     export type Disposition = 'left' | 'bottom' | 'right'
@@ -30,13 +36,13 @@ export namespace DockableTabs {
     export class State {
         public readonly disposition: Disposition
         public readonly viewState$: BehaviorSubject<DisplayMode>
-        public readonly tabs$: BehaviorSubject<Tab[]>
+        public readonly tabs$: Observable<Tab[]>
         public readonly selected$: Subject<string>
         public readonly persistTabsView: boolean = false
         constructor(params: {
             disposition: Disposition
             viewState$: BehaviorSubject<DisplayMode>
-            tabs$: BehaviorSubject<Tab[]>
+            tabs$: Observable<Tab[]>
             selected$: Subject<string>
             persistTabsView?: boolean
         }) {
