@@ -53,13 +53,11 @@ export namespace DockableTabs {
     const baseStyle = (disposition: Disposition) => {
         if (disposition == 'bottom') {
             return {
-                height: '50%',
                 opacity: '1',
             }
         }
         if (disposition == 'left' || 'right') {
             return {
-                width: '300px',
                 opacity: '1',
             }
         }
@@ -67,26 +65,11 @@ export namespace DockableTabs {
 
     const styleFactory = (
         disposition: Disposition,
-        styleOptions: StyleOptions,
     ): Record<DisplayMode, { [k: string]: string }> => {
         const base = baseStyle(disposition)
         const pined = {
             ...base,
             position: 'static',
-        }
-        const pinedVariable: Record<Disposition, { [k: string]: string }> = {
-            bottom: {
-                minHeight: styleOptions.initialPanelSize,
-                maxHeight: styleOptions.initialPanelSize,
-            },
-            left: {
-                minWidth: styleOptions.initialPanelSize,
-                maxWidth: styleOptions.initialPanelSize,
-            },
-            right: {
-                minWidth: styleOptions.initialPanelSize,
-                maxWidth: styleOptions.initialPanelSize,
-            },
         }
 
         const expandedBase = {
@@ -94,8 +77,6 @@ export namespace DockableTabs {
             opacity: '0.95',
             zIndex: '10',
             position: 'absolute',
-            // bottom: '0px',
-            // left: '0px',
         }
         const expandedVariable: Record<Disposition, { [k: string]: string }> = {
             bottom: {
@@ -107,14 +88,10 @@ export namespace DockableTabs {
             left: {
                 top: '0px',
                 left: '0px',
-                minWidth: styleOptions.initialPanelSize,
-                maxWidth: styleOptions.initialPanelSize,
             },
             right: {
                 top: '0px',
                 right: '0px',
-                minWidth: styleOptions.initialPanelSize,
-                maxWidth: styleOptions.initialPanelSize,
             },
         }
 
@@ -140,7 +117,7 @@ export namespace DockableTabs {
                 },
             }
         return {
-            pined: { ...pined, ...pinedVariable[disposition] },
+            pined,
             expanded: { ...expandedBase, ...expandedVariable[disposition] },
             collapsed: { ...collapsedBase, ...collapsedVariable[disposition] },
         }
@@ -148,10 +125,18 @@ export namespace DockableTabs {
 
     export interface StyleOptions {
         initialPanelSize?: string
+        wrapper?: {
+            style?: { [k: string]: string }
+            class?: string
+        }
     }
     export function defaultStyleOptions(): StyleOptions {
         return {
             initialPanelSize: '300px',
+            wrapper: {
+                style: {},
+                class: '',
+            },
         }
     }
 
@@ -182,11 +167,17 @@ export namespace DockableTabs {
 
         constructor(params: { state: State; styleOptions?: StyleOptions }) {
             this.state = params.state
-            this.class = View.classFactory[this.state.disposition]
+
             this.styleOptions = {
                 ...defaultStyleOptions(),
-                ...(params.styleOptions || {}),
+                ...params.styleOptions,
             }
+
+            this.class = `${View.classFactory[this.state.disposition]} ${
+                this.styleOptions.wrapper.class
+            }`
+            this.styleOptions = defaultStyleOptions()
+
             let headerView = new HeaderView({
                 state: this.state,
                 connectedCallback: (e) => {
@@ -212,9 +203,10 @@ export namespace DockableTabs {
                 this.children.reverse()
 
             this.style = attr$(this.state.viewState$, (state) => {
-                return styleFactory(this.state.disposition, this.styleOptions)[
-                    state
-                ]
+                return {
+                    ...styleFactory(this.state.disposition)[state],
+                    ...this.styleOptions.wrapper.style,
+                }
             })
         }
     }
