@@ -14,7 +14,7 @@ import {
 } from 'rxjs'
 
 export namespace DockableTabs {
-    export type Disposition = 'left' | 'bottom' | 'right'
+    export type Disposition = 'left' | 'bottom' | 'right' | 'top'
     export type DisplayMode = 'pined' | 'expanded' | 'collapsed'
 
     export class Tab {
@@ -51,7 +51,7 @@ export namespace DockableTabs {
     }
 
     const baseStyle = (disposition: Disposition) => {
-        if (disposition == 'bottom') {
+        if (disposition == 'bottom' || 'top') {
             return {
                 opacity: '1',
             }
@@ -82,8 +82,10 @@ export namespace DockableTabs {
             bottom: {
                 bottom: '0px',
                 left: '0px',
-                minHeight: styleOptions.initialPanelSize,
-                maxHeight: styleOptions.initialPanelSize,
+            },
+            top: {
+                bottom: '0px',
+                left: '0px',
             },
             left: {
                 top: '0px',
@@ -101,6 +103,11 @@ export namespace DockableTabs {
         const collapsedVariable: Record<Disposition, { [k: string]: string }> =
             {
                 bottom: {
+                    height: 'fit-content',
+                    minHeight: 'auto',
+                    maxHeight: 'auto',
+                },
+                top: {
                     height: 'fit-content',
                     minHeight: 'auto',
                     maxHeight: 'auto',
@@ -144,6 +151,7 @@ export namespace DockableTabs {
         static baseClasses = 'fv-bg-background d-flex fv-text-primary'
         static classFactory: Record<Disposition, string> = {
             bottom: `w-100 flex-column fv-border-top-background-alt ${View.baseClasses}`,
+            top: `w-100 flex-column fv-border-top-background-alt ${View.baseClasses}`,
             left: `h-100 flex-row fv-border-left-background-alt  fv-border-right-background-alt ${View.baseClasses}`,
             right: `h-100 flex-row fv-border-left-background-alt  fv-border-right-background-alt ${View.baseClasses}`,
         }
@@ -260,6 +268,7 @@ export namespace DockableTabs {
         static baseClasses = 'd-flex fv-bg-background-alt'
         static classFactory: Record<Disposition, string> = {
             bottom: `w-100 flex-row  fv-border-top-background ${HeaderView.baseClasses}`,
+            top: `w-100 flex-row  fv-border-bottom-background ${HeaderView.baseClasses}`,
             left: `h-100 flex-column  fv-border-right-background ${HeaderView.baseClasses}`,
             right: `h-100 flex-column  fv-border-left-background ${HeaderView.baseClasses}`,
         }
@@ -308,10 +317,12 @@ export namespace DockableTabs {
             'd-flex align-items-center fv-pointer fv-hover-bg-background rounded'
         static classFactory: Record<Disposition, string> = {
             bottom: `flex-row ${TabHeaderView.baseClasses} px-2 mx-1`,
+            top: `flex-row ${TabHeaderView.baseClasses} px-2 mx-1`,
             left: `flex-column ${TabHeaderView.baseClasses} py-2 my-1`,
             right: `flex-column ${TabHeaderView.baseClasses} py-2 my-1`,
         }
         static classFactorySelected: Record<Disposition, string> = {
+            top: `fv-border-bottom-focus `,
             bottom: `fv-border-top-focus `,
             left: `fv-border-right-focus`,
             right: `fv-border-left-focus`,
@@ -319,6 +330,7 @@ export namespace DockableTabs {
         static baseStyle = { borderWidth: '3px' }
         static styleFactory: Record<Disposition, { [k: string]: string }> = {
             bottom: {},
+            top: {},
             left: {
                 width: 'fit-content',
             },
@@ -329,6 +341,7 @@ export namespace DockableTabs {
 
         static styleText: Record<Disposition, { [k: string]: string }> = {
             bottom: {},
+            top: {},
             left: {
                 writingMode: 'vertical-rl',
                 textOrientation: 'mixed',
@@ -371,7 +384,11 @@ export namespace DockableTabs {
                     class: this.icon,
                 },
                 {
-                    class: this.state.disposition == 'bottom' ? 'ml-2' : 'mt-2',
+                    class:
+                        this.state.disposition == 'bottom' ||
+                        this.state.disposition == 'top'
+                            ? 'ml-2'
+                            : 'mt-2',
                     style: TabHeaderView.styleText[this.state.disposition],
                     innerText: this.title,
                 },
