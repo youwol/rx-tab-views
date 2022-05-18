@@ -2,6 +2,7 @@ import {
     attr$,
     child$,
     children$,
+    childrenWithReplace$,
     Stream$,
     VirtualDOM,
 } from '@youwol/flux-view'
@@ -222,7 +223,7 @@ export namespace DockableTabs {
     export class TabContent implements VirtualDOM {
         public readonly state: State
         public readonly class: Stream$<DisplayMode, string>
-        public readonly children: VirtualDOM[] | Stream$<Tab[], VirtualDOM[]>
+        public readonly children
         public readonly style = {
             minHeight: '0px',
         }
@@ -234,15 +235,13 @@ export namespace DockableTabs {
                     : 'flex-grow-1 fv-bg-background fv-x-lighter'
             })
             this.children = this.state.persistTabsView
-                ? children$(this.state.tabs$, (tabs) => {
-                      return tabs.map((tab) => {
-                          return {
-                              class: attr$(this.state.selected$, (selected) =>
-                                  selected == tab.id ? 'h-100 w-100' : 'd-none',
-                              ),
-                              children: [tab.content()],
-                          }
-                      })
+                ? childrenWithReplace$(this.state.tabs$, (tab) => {
+                      return {
+                          class: attr$(this.state.selected$, (selected) =>
+                              selected == tab.id ? 'h-100 w-100' : 'd-none',
+                          ),
+                          children: [tab.content()],
+                      }
                   })
                 : [
                       child$(
