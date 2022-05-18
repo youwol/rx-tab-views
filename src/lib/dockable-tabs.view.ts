@@ -233,7 +233,7 @@ export namespace DockableTabs {
             this.class = attr$(this.state.viewState$, (viewState) => {
                 return viewState == 'collapsed'
                     ? 'd-none'
-                    : 'flex-grow-1 fv-bg-background fv-x-lighter'
+                    : 'd-block h-100 w-100'
             })
             this.children = this.state.persistTabsView
                 ? childrenWithReplace$(this.state.tabs$, (tab) => {
