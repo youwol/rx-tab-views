@@ -17,18 +17,19 @@ import {
 export namespace DockableTabs {
     export type Disposition = 'left' | 'bottom' | 'right' | 'top'
     export type DisplayMode = 'pined' | 'expanded' | 'collapsed'
+    export type ContentGenerator = (p: { tabsState: State }) => VirtualDOM
 
     export class Tab {
         public readonly id: string
         public readonly title: string
         public readonly icon: string
-        public readonly content: () => VirtualDOM
+        public readonly content: ContentGenerator
 
         constructor(params: {
             id: string
             title: string
             icon: string
-            content: () => VirtualDOM
+            content: ContentGenerator
         }) {
             Object.assign(this, params)
         }
@@ -240,7 +241,11 @@ export namespace DockableTabs {
                           class: attr$(this.state.selected$, (selected) =>
                               selected == tab.id ? 'h-100 w-100' : 'd-none',
                           ),
-                          children: [tab.content()],
+                          children: [
+                              tab.content({
+                                  tabsState: this.state,
+                              }),
+                          ],
                       }
                   })
                 : [
@@ -256,7 +261,9 @@ export namespace DockableTabs {
                                   (tab) => tab.id == selected,
                               )
                               if (!selectedTab) return {}
-                              return selectedTab.content()
+                              return selectedTab.content({
+                                  tabsState: this.state,
+                              })
                           },
                       ),
                   ]
