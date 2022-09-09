@@ -1,21 +1,53 @@
-<h1 align="center">fv-tabs 👋</h1>
+Tabs widgets using flux-view.
 
-<p>
-    <img alt="Version" src="https://img.shields.io/badge/version-0.0.0-blue.svg?cacheSeconds=2592000" />
-    <a href="https://github.com/kefranabg/readme-md-generator/graphs/commit-activity" target="_blank">
-        <img alt="Maintenance" src="https://img.shields.io/badge/Maintained%3F-yes-green.svg" />
-    </a>
-    <a href="https://github.com/kefranabg/readme-md-generator/blob/master/LICENSE" target="_blank">
-        <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg" />
-    </a>
-</p>
+This library is part of the hybrid cloud/local ecosystem 
+[YouWol](https://platform.youwol.com/applications/@youwol/platform/latest)
 
-> 
+## Links
+
+[Online user-guide](https://l.youwol.com/doc/@youwol/fv-tabs)
+
+[Developers documentation](https://platform.youwol.com/applications/@youwol/cdn-explorer/latest?package=@youwol/fv-tabs)
+
+[Package on npm](https://www.npmjs.com/package/@youwol/fv-tabs)
+
+[Source on GitHub](https://github.com/youwol/fv-tabs)
+
+# Installation, Build, Test
+
+To install the required dependencies:
+
+```shell
+yarn
+```
+---
+To build for development:
+
+```shell
+yarn build:dev
+```
+
+To build for production:
+
+```shell
+yarn build:prod
+```
+---
 
 
-## What is it?
+To run tests:
+```shell
+yarn test
+```
 
-Couple of tabs widgets created using <a href="https://github.com/youwol/flux-view">flux-view</a>.
+Coverage can be evaluated using:
+```shell
+yarn test-coverage
+```
+---
 
-Examples are provided in
- <a href='https://codesandbox.io/s/github/youwol/fv-tabs/blob/master/src/demos/showcase?file=/index.html'>code sandbox</a>
+To generate code's documentation:
+
+```shell
+yarn doc
+```
