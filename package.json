@@ -1,7 +1,7 @@
 {
     "name": "@youwol/fv-tabs",
     "description": "Tabs widgets using flux-view.",
-    "version": "0.1.3-wip",
+    "version": "0.2.0",
     "author": "greinisch@youwol.com",
     "homepage": "https://github.com/youwol/fv-tabs#README.md",
     "main": "dist/@youwol/fv-tabs.js",
