@@ -1,7 +1,7 @@
 {
     "name": "@youwol/fv-tabs",
     "description": "Tabs widgets using flux-view.",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "author": "greinisch@youwol.com",
     "homepage": "https://github.com/youwol/fv-tabs#README.md",
     "main": "dist/@youwol/fv-tabs.js",
@@ -59,12 +59,12 @@
     },
     "dependencies": {
         "rxjs": "^6.5.5",
-        "@youwol/flux-view": "^1.0.0"
+        "@youwol/flux-view": "^1.0.3"
     },
     "youwol": {
         "cdnDependencies": {
             "rxjs": "^6.5.5",
-            "@youwol/flux-view": "^1.0.0"
+            "@youwol/flux-view": "^1.0.3"
         }
     }
 }
