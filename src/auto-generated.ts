@@ -1,8 +1,8 @@
 
 const runTimeDependencies = {
     "externals": {
-        "rxjs": "^6.5.5",
-        "@youwol/flux-view": "^1.0.3"
+        "rxjs": "^7.5.6",
+        "@youwol/rx-vdom": "^1.0.1"
     },
     "includedInBundle": {}
 }
@@ -10,30 +10,30 @@ const externals = {
     "rxjs": {
         "commonjs": "rxjs",
         "commonjs2": "rxjs",
-        "root": "rxjs_APIv6"
+        "root": "rxjs_APIv7"
     },
-    "@youwol/flux-view": {
-        "commonjs": "@youwol/flux-view",
-        "commonjs2": "@youwol/flux-view",
-        "root": "@youwol/flux-view_APIv1"
+    "@youwol/rx-vdom": {
+        "commonjs": "@youwol/rx-vdom",
+        "commonjs2": "@youwol/rx-vdom",
+        "root": "@youwol/rx-vdom_APIv1"
     },
     "rxjs/operators": {
         "commonjs": "rxjs/operators",
         "commonjs2": "rxjs/operators",
         "root": [
-            "rxjs_APIv6",
+            "rxjs_APIv7",
             "operators"
         ]
     }
 }
 const exportedSymbols = {
     "rxjs": {
-        "apiKey": "6",
+        "apiKey": "7",
         "exportedSymbol": "rxjs"
     },
-    "@youwol/flux-view": {
+    "@youwol/rx-vdom": {
         "apiKey": "1",
-        "exportedSymbol": "@youwol/flux-view"
+        "exportedSymbol": "@youwol/rx-vdom"
     }
 }
 
@@ -41,25 +41,25 @@ const mainEntry : {entryFile: string,loadDependencies:string[]} = {
     "entryFile": "./index.ts",
     "loadDependencies": [
         "rxjs",
-        "@youwol/flux-view"
+        "@youwol/rx-vdom"
     ]
 }
 
 const secondaryEntries : {[k:string]:{entryFile: string, name: string, loadDependencies:string[]}}= {}
 
 const entries = {
-     '@youwol/fv-tabs': './index.ts',
-    ...Object.values(secondaryEntries).reduce( (acc,e) => ({...acc, [`@youwol/fv-tabs/${e.name}`]:e.entryFile}), {})
+     '@youwol/rx-tab-views': './index.ts',
+    ...Object.values(secondaryEntries).reduce( (acc,e) => ({...acc, [`@youwol/rx-tab-views/${e.name}`]:e.entryFile}), {})
 }
 export const setup = {
-    name:'@youwol/fv-tabs',
-        assetId:'QHlvdXdvbC9mdi10YWJz',
+    name:'@youwol/rx-tab-views',
+        assetId:'QHlvdXdvbC9yeC10YWItdmlld3M=',
     version:'0.3.0-wip',
-    shortDescription:"Tabs widgets using flux-view.",
-    developerDocumentation:'https://platform.youwol.com/applications/@youwol/cdn-explorer/latest?package=@youwol/fv-tabs&tab=doc',
-    npmPackage:'https://www.npmjs.com/package/@youwol/fv-tabs',
-    sourceGithub:'https://github.com/youwol/fv-tabs',
-    userGuide:'https://l.youwol.com/doc/@youwol/fv-tabs',
+    shortDescription:"Tabs widgets using @youwol/rx-vdom.",
+    developerDocumentation:'https://platform.youwol.com/applications/@youwol/cdn-explorer/latest?package=@youwol/rx-tab-views&tab=doc',
+    npmPackage:'https://www.npmjs.com/package/@youwol/rx-tab-views',
+    sourceGithub:'https://github.com/youwol/rx-tab-views',
+    userGuide:'https://l.youwol.com/doc/@youwol/rx-tab-views',
     apiVersion:'03',
     runTimeDependencies,
     externals,
@@ -85,7 +85,7 @@ export const setup = {
             modules,
             scripts,
         }).then(() => {
-            return window[`@youwol/fv-tabs_APIv03`]
+            return window[`@youwol/rx-tab-views_APIv03`]
         })
     },
     installAuxiliaryModule: ({name, cdnClient, installParameters}:{
@@ -100,7 +100,7 @@ export const setup = {
         const parameters = installParameters || {}
         const scripts = [
             ...(parameters.scripts || []),
-            `@youwol/fv-tabs#0.3.0-wip~dist/@youwol/fv-tabs/${entry.name}.js`
+            `@youwol/rx-tab-views#0.3.0-wip~dist/@youwol/rx-tab-views/${entry.name}.js`
         ]
         const modules = [
             ...(parameters.modules || []),
@@ -111,7 +111,7 @@ export const setup = {
             modules,
             scripts,
         }).then(() => {
-            return window[`@youwol/fv-tabs/${entry.name}_APIv03`]
+            return window[`@youwol/rx-tab-views/${entry.name}_APIv03`]
         })
     },
     getCdnDependencies(name?: string){

@@ -1,19 +1,19 @@
-# @youwol/fv-tabs
+# @youwol/rx-tab-views
 
-Tabs widgets using flux-view.
+Tabs widgets using @youwol/rx-vdom.
 
 This library is part of the hybrid cloud/local ecosystem
 [YouWol](https://platform.youwol.com/applications/@youwol/platform/latest).
 
 ## Links
 
-[Online user-guide](https://l.youwol.com/doc/@youwol/fv-tabs)
+[Online user-guide](https://l.youwol.com/doc/@youwol/rx-tab-views)
 
-[Developers documentation](https://platform.youwol.com/applications/@youwol/cdn-explorer/latest?package=@youwol/fv-tabs&tab=doc)
+[Developers documentation](https://platform.youwol.com/applications/@youwol/cdn-explorer/latest?package=@youwol/rx-tab-views&tab=doc)
 
-[Package on npm](https://www.npmjs.com/package/@youwol/fv-tabs)
+[Package on npm](https://www.npmjs.com/package/@youwol/rx-tab-views)
 
-[Source on GitHub](https://github.com/youwol/fv-tabs)
+[Source on GitHub](https://github.com/youwol/rx-tab-views)
 
 # Installation, Build, Test
 
