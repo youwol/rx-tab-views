@@ -1,7 +1,7 @@
 {
     "name": "@youwol/rx-tab-views",
     "description": "Tabs widgets using @youwol/rx-vdom.",
-    "version": "0.3.0-wip",
+    "version": "0.3.0",
     "author": "greinisch@youwol.com",
     "homepage": "https://github.com/youwol/rx-tab-views#README.md",
     "main": "dist/@youwol/rx-tab-views.js",

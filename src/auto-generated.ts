@@ -16,14 +16,6 @@ const externals = {
         "commonjs": "@youwol/rx-vdom",
         "commonjs2": "@youwol/rx-vdom",
         "root": "@youwol/rx-vdom_APIv1"
-    },
-    "rxjs/operators": {
-        "commonjs": "rxjs/operators",
-        "commonjs2": "rxjs/operators",
-        "root": [
-            "rxjs_APIv7",
-            "operators"
-        ]
     }
 }
 const exportedSymbols = {
@@ -54,7 +46,7 @@ const entries = {
 export const setup = {
     name:'@youwol/rx-tab-views',
         assetId:'QHlvdXdvbC9yeC10YWItdmlld3M=',
-    version:'0.3.0-wip',
+    version:'0.3.0',
     shortDescription:"Tabs widgets using @youwol/rx-vdom.",
     developerDocumentation:'https://platform.youwol.com/applications/@youwol/cdn-explorer/latest?package=@youwol/rx-tab-views&tab=doc',
     npmPackage:'https://www.npmjs.com/package/@youwol/rx-tab-views',
@@ -100,7 +92,7 @@ export const setup = {
         const parameters = installParameters || {}
         const scripts = [
             ...(parameters.scripts || []),
-            `@youwol/rx-tab-views#0.3.0-wip~dist/@youwol/rx-tab-views/${entry.name}.js`
+            `@youwol/rx-tab-views#0.3.0~dist/@youwol/rx-tab-views/${entry.name}.js`
         ]
         const modules = [
             ...(parameters.modules || []),
