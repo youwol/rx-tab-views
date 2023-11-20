@@ -1,6 +1,6 @@
 {
-    "name": "@youwol/fv-tabs",
-    "description": "Tabs widgets using flux-view.",
+    "name": "@youwol/rx-tab-views",
+    "description": "Tabs widgets using @youwol/rx-vdom.",
     "version": "0.3.0-wip",
     "author": "greinisch@youwol.com",
     "homepage": "https://github.com/youwol/fv-tabs#README.md",
