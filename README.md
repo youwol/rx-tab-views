@@ -9,7 +9,7 @@ This library is part of the hybrid cloud/local ecosystem
 
 [Online user-guide](https://l.youwol.com/doc/@youwol/fv-tabs)
 
-[Developers documentation](https://platform.youwol.com/applications/@youwol/cdn-explorer/latest?package=@youwol/fv-tabs)
+[Developers documentation](https://platform.youwol.com/applications/@youwol/cdn-explorer/latest?package=@youwol/fv-tabs&tab=doc)
 
 [Package on npm](https://www.npmjs.com/package/@youwol/fv-tabs)
 
@@ -38,6 +38,8 @@ yarn build:prod
 ```
 
 ---
+
+<!-- no specific test configuration documented -->
 
 To run tests:
 
