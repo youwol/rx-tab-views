@@ -1,10 +1,19 @@
-import { BehaviorSubject, combineLatest, Observable, of } from 'rxjs'
-import { filter, map } from 'rxjs/operators'
-import { attr$, child$, VirtualDOM } from '@youwol/flux-view'
+import {
+    BehaviorSubject,
+    combineLatest,
+    Observable,
+    of,
+    filter,
+    map,
+} from 'rxjs'
+import { ChildrenLike, VirtualDOM, AnyVirtualDOM } from '@youwol/rx-vdom'
 
 export namespace Tabs {
     export class TabData {
-        constructor(public readonly id: string, public readonly name: string) {}
+        constructor(
+            public readonly id: string,
+            public readonly name: string,
+        ) {}
     }
 
     export class State {
@@ -43,7 +52,7 @@ export namespace Tabs {
         containerStyle?: { [key: string]: string }
     }
 
-    export class View implements VirtualDOM {
+    export class View implements VirtualDOM<'div'> {
         static defaultOptions: TOptions = {
             headerClass: 'd-flex fv-text-primary fv-bg-background fv-pointer',
             headerStyle: {},
@@ -52,9 +61,9 @@ export namespace Tabs {
             containerClass: 'border flex-grow-1 w-100',
             containerStyle: { 'min-height': '0px' },
         }
-
+        public readonly tag = 'div'
         public readonly state: State
-        public readonly children: Array<VirtualDOM>
+        public readonly children: ChildrenLike
 
         constructor({
             state,
@@ -64,39 +73,47 @@ export namespace Tabs {
             ...rest
         }: {
             state: State
-            contentView: (state: State, tabDate: TabData) => VirtualDOM
-            headerView: (state: State, tabDate: TabData) => VirtualDOM
+            contentView: (state: State, tabDate: TabData) => AnyVirtualDOM
+            headerView: (state: State, tabDate: TabData) => AnyVirtualDOM
             options?: TOptions
             [_key: string]: unknown
         }) {
             Object.assign(this, rest)
-            let styling: TOptions = {
+            const styling: TOptions = {
                 ...View.defaultOptions,
-                ...(options ? options : {}),
+                ...(options || {}),
             }
             this.state = state
-            let selectedId$ = this.state.selectedId$.pipe(
+            const selectedId$ = this.state.selectedId$.pipe(
                 filter((id) => id != undefined),
             )
 
-            let headers$ = child$(
-                this.state.tabsData$,
-                (tabs: Array<TabData>) => {
+            const headers$ = {
+                source$: this.state.tabsData$,
+                vdomMap: (tabs: Array<TabData>) => {
                     return {
+                        tag: 'div' as const,
                         class: styling.headerClass,
                         style: styling.headerStyle,
                         children: tabs.map((tabData) => {
                             return {
-                                class: attr$(selectedId$, (id: string) => {
-                                    return id == tabData.id
-                                        ? styling.selectedHeaderClass
-                                        : ''
-                                }),
-                                style: attr$(selectedId$, (id: string) => {
-                                    return id == tabData.id
-                                        ? styling.selectedHeaderStyle
-                                        : {}
-                                }),
+                                tag: 'div' as const,
+                                class: {
+                                    source$: selectedId$,
+                                    vdomMap: (id: string) => {
+                                        return id == tabData.id
+                                            ? styling.selectedHeaderClass
+                                            : ''
+                                    },
+                                },
+                                style: {
+                                    source$: selectedId$,
+                                    vdomMap: (id: string) => {
+                                        return id == tabData.id
+                                            ? styling.selectedHeaderStyle
+                                            : {}
+                                    },
+                                },
                                 children: [headerView(state, tabData)],
                                 onclick: (ev) => {
                                     ev.stopPropagation()
@@ -106,20 +123,24 @@ export namespace Tabs {
                         }),
                     }
                 },
-            )
-            let content$ = child$(
-                combineLatest([selectedId$, this.state.tabsData$]).pipe(
+            }
+            const content$ = {
+                source$: combineLatest([
+                    selectedId$,
+                    this.state.tabsData$,
+                ]).pipe(
                     map(([id, tabsData]) =>
                         tabsData.find((tab) => tab.id == id),
                     ),
                     filter((tabData) => tabData != undefined),
                 ),
-                (tabData) => contentView(this.state, tabData),
-            )
+                vdomMap: (tabData) => contentView(this.state, tabData),
+            }
 
             this.children = [
                 headers$,
                 {
+                    tag: 'div',
                     class: styling.containerClass,
                     style: styling.containerStyle,
                     children: [content$],

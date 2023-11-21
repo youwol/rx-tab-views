@@ -1,11 +1,4 @@
-import {
-    attr$,
-    child$,
-    children$,
-    childrenWithReplace$,
-    Stream$,
-    VirtualDOM,
-} from '@youwol/flux-view'
+import { VirtualDOM, ChildrenLike, RxAttribute } from '@youwol/rx-vdom'
 import {
     BehaviorSubject,
     combineLatest,
@@ -17,7 +10,9 @@ import {
 export namespace DockableTabs {
     export type Disposition = 'left' | 'bottom' | 'right' | 'top'
     export type DisplayMode = 'pined' | 'expanded' | 'collapsed'
-    export type ContentGenerator = (p: { tabsState: State }) => VirtualDOM
+    export type ContentGenerator = (p: {
+        tabsState: State
+    }) => VirtualDOM<'div'>
 
     export class Tab {
         public readonly id: string
@@ -52,16 +47,9 @@ export namespace DockableTabs {
         }
     }
 
-    const baseStyle = (disposition: Disposition) => {
-        if (disposition == 'bottom' || 'top') {
-            return {
-                opacity: '1',
-            }
-        }
-        if (disposition == 'left' || 'right') {
-            return {
-                opacity: '1',
-            }
+    const baseStyle = (_disposition: Disposition) => {
+        return {
+            opacity: '1',
         }
     }
 
@@ -149,7 +137,7 @@ export namespace DockableTabs {
         }
     }
 
-    export class View implements VirtualDOM {
+    export class View implements VirtualDOM<'div'> {
         static baseClasses = 'fv-bg-background d-flex fv-text-primary'
         static classFactory: Record<Disposition, string> = {
             bottom: `w-100 flex-column fv-border-top-background-alt ${View.baseClasses}`,
@@ -157,9 +145,10 @@ export namespace DockableTabs {
             left: `h-100 flex-row fv-border-left-background-alt  fv-border-right-background-alt ${View.baseClasses}`,
             right: `h-100 flex-row fv-border-left-background-alt  fv-border-right-background-alt ${View.baseClasses}`,
         }
+        public readonly tag = 'div'
         public readonly state: State
         public readonly class: string
-        public readonly children: VirtualDOM[]
+        public readonly children: ChildrenLike
         public readonly styleOptions: StyleOptions
 
         public readonly onmouseenter = () => {
@@ -168,12 +157,13 @@ export namespace DockableTabs {
             }
         }
         public readonly onmouseleave = () => {
-            if (this.state.viewState$.getValue() == 'expanded')
+            if (this.state.viewState$.getValue() == 'expanded') {
                 this.state.viewState$.next('collapsed')
+            }
         }
-        public readonly style: Stream$<DisplayMode, { [k: string]: string }>
+        public readonly style: RxAttribute<DisplayMode, { [k: string]: string }>
 
-        public readonly placeholder$ = new ReplaySubject<VirtualDOM>(1)
+        public readonly placeholder$ = new ReplaySubject<VirtualDOM<'div'>>(1)
 
         constructor(params: { state: State; styleOptions?: StyleOptions }) {
             this.state = params.state
@@ -188,89 +178,118 @@ export namespace DockableTabs {
             }`
             this.styleOptions = defaultStyleOptions()
 
-            let headerView = new HeaderView({
+            const headerView = new HeaderView({
                 state: this.state,
                 connectedCallback: (e) => {
                     const vDOM = {
-                        style: attr$(this.state.viewState$, (displayMode) => {
-                            return displayMode == 'expanded'
-                                ? {
-                                      width: `${e.offsetWidth}px`,
-                                  }
-                                : { width: '0px' }
-                        }),
+                        tag: 'div' as const,
+                        style: {
+                            source$: this.state.viewState$,
+                            vdomMap: (displayMode) => {
+                                return displayMode == 'expanded'
+                                    ? {
+                                          width: `${e.offsetWidth}px`,
+                                      }
+                                    : { width: '0px' }
+                            },
+                        },
                     }
                     this.placeholder$.next(vDOM)
                 },
             })
-            let contentView = new TabContent({ state: this.state })
+            const contentView = new TabContent({ state: this.state })
 
             this.children = [headerView, contentView]
             if (
                 this.state.disposition == 'bottom' ||
                 this.state.disposition == 'right'
-            )
+            ) {
                 this.children.reverse()
+            }
 
-            this.style = attr$(this.state.viewState$, (state) => {
-                return {
-                    ...styleFactory(this.state.disposition)[state],
-                    ...this.styleOptions.wrapper.style,
-                }
-            })
+            this.style = {
+                source$: this.state.viewState$,
+                vdomMap: (state) => {
+                    return {
+                        ...styleFactory(this.state.disposition)[state],
+                        ...this.styleOptions.wrapper.style,
+                    }
+                },
+            }
         }
     }
 
-    export class TabContent implements VirtualDOM {
+    export class TabContent implements VirtualDOM<'div'> {
         public readonly state: State
-        public readonly class: Stream$<DisplayMode, string>
-        public readonly children
+        public readonly tag = 'div'
+        public readonly class: RxAttribute<DisplayMode, string>
+        public readonly children: ChildrenLike
         public readonly style = {
             minHeight: '0px',
         }
         constructor(params: { state }) {
             Object.assign(this, params)
-            this.class = attr$(this.state.viewState$, (viewState) => {
-                return viewState == 'collapsed'
-                    ? 'd-none'
-                    : 'd-block h-100 w-100'
-            })
+            this.class = {
+                source$: this.state.viewState$,
+                vdomMap: (viewState) => {
+                    return viewState == 'collapsed'
+                        ? 'd-none'
+                        : 'd-block h-100 w-100'
+                },
+            }
             this.children = this.state.persistTabsView
-                ? childrenWithReplace$(this.state.tabs$, (tab) => {
-                      return {
-                          class: attr$(this.state.selected$, (selected) =>
-                              selected == tab.id ? 'h-100 w-100' : 'd-none',
-                          ),
-                          children: [
-                              tab.content({
-                                  tabsState: this.state,
-                              }),
-                          ],
-                      }
-                  })
+                ? {
+                      policy: 'sync',
+                      source$: this.state.tabs$,
+                      vdomMap: (tab: Tab) => {
+                          return {
+                              tag: 'div' as const,
+                              class: {
+                                  source$: this.state.selected$,
+                                  vdomMap: (selected: string) =>
+                                      selected == tab.id
+                                          ? 'h-100 w-100'
+                                          : 'd-none',
+                              },
+                              children: [
+                                  tab.content({
+                                      tabsState: this.state,
+                                  }),
+                              ],
+                          }
+                      },
+                  }
                 : [
-                      child$(
-                          combineLatest([
+                      {
+                          source$: combineLatest([
                               this.state.viewState$,
                               this.state.selected$,
                               this.state.tabs$,
                           ]),
-                          ([viewState, selected, tabs]) => {
-                              if (viewState == 'collapsed') return {}
+                          vdomMap: ([viewState, selected, tabs]: [
+                              DisplayMode,
+                              string,
+                              Tab[],
+                          ]) => {
+                              if (viewState == 'collapsed') {
+                                  return { tag: 'div' as const }
+                              }
                               const selectedTab = tabs.find(
                                   (tab) => tab.id == selected,
                               )
-                              if (!selectedTab) return {}
+                              if (!selectedTab) {
+                                  return { tag: 'div' as const }
+                              }
                               return selectedTab.content({
                                   tabsState: this.state,
                               })
                           },
-                      ),
+                      },
                   ]
         }
     }
 
-    export class HeaderView implements VirtualDOM {
+    export class HeaderView implements VirtualDOM<'div'> {
         static baseClasses = 'd-flex fv-bg-background-alt'
         static classFactory: Record<Disposition, string> = {
             bottom: `w-100 flex-row  fv-border-top-background ${HeaderView.baseClasses}`,
@@ -278,10 +297,10 @@ export namespace DockableTabs {
             left: `h-100 flex-column  fv-border-right-background ${HeaderView.baseClasses}`,
             right: `h-100 flex-column  fv-border-left-background ${HeaderView.baseClasses}`,
         }
-
+        public readonly tag = 'div'
         public readonly class: string
         public readonly state: State
-        public readonly children //: VirtualDOM[]
+        public readonly children: ChildrenLike
         public readonly connectedCallback: (element: HTMLDivElement) => void
 
         constructor(params: {
@@ -293,32 +312,40 @@ export namespace DockableTabs {
             const baseClasses =
                 'p-1 fas fa-thumbtack fv-pointer fv-hover-xx-darker'
             const pinView = {
-                class: attr$(this.state.viewState$, (state) => {
-                    return state == 'pined'
-                        ? `${baseClasses} fv-text-focus`
-                        : baseClasses
-                }),
+                tag: 'div' as const,
+                class: {
+                    source$: this.state.viewState$,
+                    vdomMap: (state) => {
+                        return state == 'pined'
+                            ? `${baseClasses} fv-text-focus`
+                            : baseClasses
+                    },
+                },
                 onclick: () => {
                     this.state.viewState$.getValue() == 'pined'
                         ? this.state.viewState$.next('expanded')
                         : this.state.viewState$.next('pined')
                 },
             }
-            this.children = children$(this.state.tabs$, (tabs: Tab[]) => {
-                return [
-                    pinView,
-                    ...tabs.map((tab) => {
-                        return new TabHeaderView({
-                            ...tab,
-                            state: this.state,
-                        }) as VirtualDOM
-                    }),
-                ]
-            })
+            this.children = {
+                policy: 'replace',
+                source$: this.state.tabs$,
+                vdomMap: (tabs: Tab[]) => {
+                    return [
+                        pinView,
+                        ...tabs.map((tab) => {
+                            return new TabHeaderView({
+                                ...tab,
+                                state: this.state,
+                            })
+                        }),
+                    ]
+                },
+            }
         }
     }
 
-    export class TabHeaderView implements VirtualDOM {
+    export class TabHeaderView implements VirtualDOM<'div'> {
         static baseClasses =
             'd-flex align-items-center fv-pointer fv-hover-bg-background rounded'
         static classFactory: Record<Disposition, string> = {
@@ -358,13 +385,14 @@ export namespace DockableTabs {
                 textOrientation: 'mixed',
             },
         }
+        public readonly tag = 'div'
         public readonly state: State
         public readonly style: { [k: string]: string }
-        public readonly class: Stream$<string, string>
+        public readonly class: RxAttribute<string, string>
         public readonly id: string
         public readonly title: string
         public readonly icon: string
-        public readonly children: VirtualDOM[]
+        public readonly children: ChildrenLike
 
         public readonly onclick = () => {
             this.state.selected$.next(this.id)
@@ -375,21 +403,26 @@ export namespace DockableTabs {
                 ...TabHeaderView.baseStyle,
                 ...TabHeaderView.styleFactory[this.state.disposition],
             }
-            let baseClass = TabHeaderView.classFactory[this.state.disposition]
-            this.class = attr$(this.state.selected$, (selected) => {
-                return this.id == selected
-                    ? `${baseClass} ${
-                          TabHeaderView.classFactorySelected[
-                              this.state.disposition
-                          ]
-                      }`
-                    : baseClass
-            })
+            const baseClass = TabHeaderView.classFactory[this.state.disposition]
+            this.class = {
+                source$: this.state.selected$,
+                vdomMap: (selected) => {
+                    return this.id == selected
+                        ? `${baseClass} ${
+                              TabHeaderView.classFactorySelected[
+                                  this.state.disposition
+                              ]
+                          }`
+                        : baseClass
+                },
+            }
             this.children = [
                 {
+                    tag: 'div',
                     class: this.icon,
                 },
                 {
+                    tag: 'div',
                     class:
                         this.state.disposition == 'bottom' ||
                         this.state.disposition == 'top'
